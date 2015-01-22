@@ -26,6 +26,7 @@ require("Application.php");
 /**
  * Array of bidirectional connection weights that are basic input for application
  */
+/*
 $connections = array(
     'h1'  => array('h2' => 2, 'a1' => 5, 'cz2' => 9, 'cz1' => 7, 'i3' => 6),
     'h2'  => array('a1' => 3, 'cz2' => 6, 'nj3' => 9, 'i4' => 11),
@@ -36,7 +37,6 @@ $connections = array(
     'nj2' => array('b1' => 7, 'f3' => 10, 'f1' => 8, 'f5' => 5),
     'nj3' => array('f1' => 15, 'f2' => 9, 's1' => 5, 'nj2' => 2),
     'b1'  => array('f4' => 1, 'f3' => 7, 'f5' => 9, 's1' => 10),
-    #
     's1'  => array('i1' => 3, 'i2' => 5, 'f5' => 2,),
     'i1'  => array('i3' => 5, 'i2' => 4, 'i4' => 8, 'f1' => 12),
     'i2'  => array('i4' => 2, 'f2' => 8, 'f3' => 11, 'f5' => 5),
@@ -46,7 +46,6 @@ $connections = array(
     'f2'  => array('f4' => 7, 'f3' => 1, 'f1' => 2),
     'f3'  => array('sh4' => 15),
     'f4'  => array('f1' => 7),
-    #
     'f5'  => array('f1' => 4, 'sh6' => 11),
     'sh1' => array('p1' => 6, 'p2' => 12),
     'sh2' => array('sh1' => 3, 'sh4' => 5, 'p1' => 7),
@@ -57,6 +56,19 @@ $connections = array(
     'p1'  => array('p2' => 3),
     'p2'  => array('p2' => 0),
 );
+*/
+
+// Load connections
+$connections = json_decode(file_get_contents("web/data/connections.json"), true);
+
+// Load positions and parse it
+$positions = json_decode(file_get_contents("web/data/positions.json"), true);
+$associativePositions = array();
+foreach ($positions as $p) {
+    $associativePositions[$p['label']] = array('lat' => $p['lat'], 'lng' => $p['lng']);
+
+}
+unset($positions);
 
 $app = new Application($connections);
 
@@ -64,6 +76,8 @@ echo "1. Calculating shortest path from {$argv[1]} to {$argv[2]}" . PHP_EOL . PH
 $app->findShortestPath($argv[1], $argv[2]);
 $app->printShortestPath();
 
+$namedShortestPath = $app->getResult();
+file_put_contents('web/data/sp_data.json', json_encode($namedShortestPath));
 
 if (!isset($argv[3]) || $argv[3] != "--simulate") {
     exit(0);
@@ -76,15 +90,18 @@ $destinationNodeName = $argv[2];
 echo "2. Simulating packet travel from {$startNodeName} to {$destinationNodeName}" . PHP_EOL . PHP_EOL;
 
 $traversedDistanceSum = 0;
+$tripHistory = array();
 
 // Skip start node
 $currentNode = $app->goToNextNodeInShortestPath();
+$tripHistory[] = $app->getCurrentNodeName();
 
 do {
     $currentNode = $app->goToNextNodeInShortestPath();
     $previousNode = $app->getPreviousNode();
     $traversedDistance = $app->getDistanceByIndex($previousNode, $currentNode);
     $traversedDistanceSum += $traversedDistance;
+    $tripHistory[] = $app->getCurrentNodeName();
 
     echo "I am on node " . Application::colorize($app->getCurrentNodeName(), "SUCCESS") . " - " . $traversedDistance . PHP_EOL;
     if ($app->iAmOnLastNode()) {
@@ -105,3 +122,11 @@ do {
 echo PHP_EOL;
 echo Application::colorize('Packet reached destination ' . $destinationNodeName . ' with total distance travelled: ' . $traversedDistanceSum,
         'SUCCESS') . PHP_EOL;
+
+// Open the file to get existing content
+echo 'Writing json' . PHP_EOL;
+$file = 'web/data/sp_modified_data.json';
+file_put_contents($file, json_encode($tripHistory));
+
+echo 'Server starting on localhost:5555' . PHP_EOL;
+echo shell_exec('php -S localhost:5555 -t web');
