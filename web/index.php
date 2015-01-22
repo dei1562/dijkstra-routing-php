@@ -93,7 +93,7 @@
             var positions = {};
 
             // Draw full graph
-            $.getJSON("../data/positions.json", function (json) {
+            $.getJSON("data/positions.json", function (json) {
                 $.each(json, function () {
                     positions[this.label] = new google.maps.LatLng(this.lat, this.lng);
                 });
