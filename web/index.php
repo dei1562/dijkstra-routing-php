@@ -100,7 +100,7 @@
             });
 
 
-            $.getJSON("../data/connections.json", function (connections) {
+            $.getJSON("data/connections.json", function (connections) {
                 for (var from in connections) {
                     if (connections.hasOwnProperty(from)) {
 
@@ -136,7 +136,7 @@
             });
 
 
-            $.getJSON("../data/sp_modified_data.json", function (sp) {
+            $.getJSON("data/sp_modified_data.json", function (sp) {
                 var shortestPathCoordinates = [];
                 for (var i = 0; i < sp.length; i++) {
                     shortestPathCoordinates.push(positions[sp[i]]);
@@ -153,7 +153,7 @@
                 modifiedSpPath.setMap(map);
             });
 
-            $.getJSON("../data/sp_data.json", function (sp) {
+            $.getJSON("data/sp_data.json", function (sp) {
                 var shortestPathCoordinates = [];
                 for (var i = 0; i < sp.length; i++) {
                     shortestPathCoordinates.push(positions[sp[i]]);
