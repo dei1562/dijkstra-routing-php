@@ -23,6 +23,8 @@ echo '
 require("Dijkstra.php");
 require("Application.php");
 
+Application::detectColorizeFlag($argv);
+
 /**
  * Array of bidirectional connection weights that are basic input for application
  */

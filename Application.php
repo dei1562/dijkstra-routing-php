@@ -3,6 +3,8 @@
 class Application
 {
 
+    private static $colorizedOutput;
+
     protected $connections;
 
     /** @var  Graph */
@@ -49,6 +51,10 @@ class Application
      */
     public static function colorize($text, $status)
     {
+        if (!self::$colorizedOutput) {
+            return $text;
+        }
+
         $out = "";
         switch ($status) {
             case "SUCCESS":
@@ -298,6 +304,21 @@ class Application
         echo PHP_EOL;
 
         echo 'SP Distance = ' . $this->getShortestPathDistance() . PHP_EOL . PHP_EOL;
+    }
+
+
+    /**
+     * Detects if --colorize flag is set for colorized output
+     * @param $argv
+     */
+    public static function detectColorizeFlag($argv)
+    {
+        self::$colorizedOutput = false;
+        foreach ($argv as $arg) {
+            if ($arg == '--colorize') {
+                self::$colorizedOutput = true;
+            }
+        }
     }
 
 }
