@@ -7,8 +7,9 @@ If simulate flag is provided, app will start simple server on localhost:5555 whe
 - **Author: Zoran Antolovic, Croatia**
 - Forked from: https://github.com/shivas/PHP-Dijkstra
 
+**Usage: ** php main.php {from} {to} [--simulate | --colorize]
 
-# CLI command start
+# CLI command start example for path from h2 to p2
 - `php main.php h2 p2` for basic SP calculation
 - `php main.php h2 p2 --simulate` for basic SP calculation and packet routing simulation
 - `php main.php h2 p2 --simulate --colorize` for colorized output in bash
